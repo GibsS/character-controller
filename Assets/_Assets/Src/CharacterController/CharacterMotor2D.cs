@@ -35,6 +35,8 @@ public class CharacterMotor2D : MonoBehaviour {
     public bool isOnOneway { get; private set; }
     public bool isOnLadder { get; private set; }
 
+    Collider2D bottomCollider;
+
     // ONEWAY
     EdgeCollider2D[] oneways;
     int onewayInd;
@@ -163,6 +165,11 @@ public class CharacterMotor2D : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(origin, direction, rayLength, terrainMask);
 
             if(hit) {
+                if(bottomCollider == null && !isOnLadder) {
+                    bottomCollider = hit.collider;
+                    transform.SetParent(bottomCollider.transform);
+                }
+
                 isGrounded = true;
 
                 if (!(hit.collider is EdgeCollider2D)) {
@@ -184,6 +191,11 @@ public class CharacterMotor2D : MonoBehaviour {
                     }
                 }
             }
+        }
+
+        if(!isGrounded && bottomCollider != null) {
+            transform.SetParent(null);
+            bottomCollider = null;
         }
 
         isOnOneway = isGrounded && isOnOneway;
